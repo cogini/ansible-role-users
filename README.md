@@ -168,7 +168,7 @@ users_admin_groups:
   - sshusers
 ```
 
-* Unix groups that admin users should have. 
+### Unix groups that admin users should have. 
 
 The role will always be added the `wheel` or `admin` group, depending on the
 platform. If there are admin users defined, then this role sets up sudo with a
@@ -182,18 +182,18 @@ users_admin_groups:
 
 ### Unix groups that regular users should have:
 ```yaml
-* users_regular_groups:
+users_regular_groups:
   - sshusers
 ```
 
-* Unix groups that the deploy user should have:
+### Unix groups that the deploy user should have:
 
 ```yaml
 users_deploy_groups:
   - sshusers
 ```
 
-* Unix groups that the app user should have:
+### Unix groups that the app user should have:
 
 ```yaml
 users_app_groups:
