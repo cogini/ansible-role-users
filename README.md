@@ -6,6 +6,9 @@ It is used to deploy one or more applications to a server. It supports creating
 accounts used to deploy and run the app, as well as accounts for system admins
 and developers.
 
+It is basically an opinionated wrapper on the
+[Ansible user module](http://docs.ansible.com/ansible/latest/user_module.html).
+
 ## User types
 
 The role supports creating the following types of user accounts:
