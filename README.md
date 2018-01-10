@@ -208,7 +208,6 @@ users.
 
     users_remove_system_authorized_keys: true
 
-
 ## Setup
 
 The normal sequence is to run this role as the first thing on a new instance.
@@ -218,13 +217,26 @@ for preparing the server for the app, e.g. creating directories and installing
 dependencies. We normally deploy the app from a build or CI server, without sudo,
 using the `deploy` user account. 
 
-Here is a minimal playbook that manages users:
+Here is a typical playbook:
 
 ```yaml
 - name: Manage users
   hosts: '*'
+  vars:
+    users_app_user: foo
+    users_app_group: foo
+    users_deploy_user: deploy
+    users_deploy_group: deploy
+    users_users:
+      - user: jake
+        name: "Jake Morrison"
+        github: reachfh
+    users_app_users:
+      - jake
+    users_deploy_users:
+      - jake
   roles:
-    - { role: cogini.users }
+    - { role: cogini.users, become: true }
 ```
 
 Add the host to the `inventory/hosts` file. 
@@ -236,14 +248,6 @@ Add the host to `.ssh/config` or a project specific `ssh.config` file.
 
     Host web-server-01
         HostName 123.45.67.89
-
-Configure the role, e.g. in `inventory/group_vars/web-servers`:
-
-    users_app_user: foo
-    users_app_group: foo
-    users_deploy_user: deploy
-    users_deploy_group: deploy
-    ...
 
 On a physical server where we start with a root account and no ssh keys, we need
 to bootstrap the server the first time, specifying the password with -k. 
