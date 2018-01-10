@@ -31,12 +31,12 @@ This user account is used to deploy the application to the server.  It owns the
 application software files and has write permissions to the deploy and config
 directories.
 
-The app and deploy accounts generally do not have sudo permissions, though we
-may make a `/etc/sudoers.d/` rule to allow them to run commands to e.g. restart
-the app by running `systemctl`. That is handled by the role that installs and
-configures the app, not this role.
+The app and deploy accounts do not have sudo permissions, though we may make a
+`/etc/sudoers.d/` rule to allow them to run commands to e.g. restart the app by
+running `systemctl`. That is handled by the role that installs and configures
+the app, not this role.
 
-For example, `/etc/sudoers.d/deploy-foo`:
+For example, make a file like `/etc/sudoers.d/deploy-foo`:
 
     {{ users_deploy_user }} ALL=(ALL) NOPASSWD: /bin/systemctl start {{ app_name }}, /bin/systemctl stop {{ app_name }}, /bin/systemctl restart {{ app_name }}, /bin/systemctl status {{ app_name }}
 
@@ -49,22 +49,26 @@ for logs, and has read-only access to its code and config files.
 
 * Developers
 
-Developers may need to access the deploy or app user account to look
-at the logs and debug it. We add the ssh keys for developers to the accounts,
-allowing them to log in via ssh.
+Developers may need to access the deploy or app user account to look at the
+logs and debug it. We add the ssh keys for developers to the accounts, allowing
+them to log in via ssh. 
 
 * Project users
 
 These users are like admins, but don't have sudo. An example might
 be an account for a customer to be able to log in and run queries against
-the db, but they don't need admin rights. Group permissions may give them
-access to e.g. log files for the app. 
+the db, but they don't need admin rights. You can give them permissions
+to e.g. access the log files for the app by adding them to the app group
+and setting file permissions. 
 
 # Configuration
 
-By default, the role does nothing. You need to add configuration vars to have
+By default, this role does nothing. You need to add configuration vars to have
 it do something. That would normally be via group vars, e.g.
 `inventory/group_vars/app-servers`, a `vars` section in a playbook, or a combination.
+
+You can have different settings on a host or group level to e.g. give
+developers login access in the dev environment but not on prod.
 
 ## App accounts
 
@@ -91,7 +95,7 @@ It is a list of dicts with four fields:
 * `name`: User's name. Optional, for documentation. 
 * `key`:  ssh public key file. Put them in e.g. your playbook `files` directory.
 * `github` is the user's GitHub id. The role gets the user keys from 
-`https://github.com/{{ key }}.keys`
+`https://github.com/{{ github }}.keys`
 
 Example: 
 
@@ -111,35 +115,35 @@ After defining the user accounts in `users_users`, configure lists of users,
 specifying the id used in the `user` key. By default, these are empty, so if
 you don't specify users, they will not be created. 
 
-Global admin users with a account, login and sudo permissions.
+Global admin users with a separate Unix account and sudo permissions.
 
 ```yaml
 users_global_admin_users:
  - jake
 ```
 
-Project level admin users with account, login and sudo permissions.
+Project level admin users with a separate Unix account and sudo permissions.
 
 ```yaml
 users_admin_users:
  - fred
 ```
 
-Project users with account and login, but no sudo permission.
+Project users with a separate Unix account but no sudo permission.
 
 ```yaml
 users_regular_users:
  - bob
 ```
 
-Users (ssh keys) who can access deploy account.
+Users (ssh keys) who can access the deploy account.
 
 ```yaml
 users_deploy_users:
  - ci
 ```
 
-Users (ssh keys) who can access app account.
+Users (ssh keys) who can access the app account.
 
 ```yaml
 users_app_users:
@@ -158,31 +162,38 @@ Add this to `/etc/ssh/sshd_config`
 
     AllowGroups sshusers sftpusers
 
-Unix groups that admin users should have. 
+Then add `sshusers` to the `users_admin_groups`, e.g.  
+```yaml
+users_admin_groups:
+  - sshusers
+```
+
+* Unix groups that admin users should have. 
 
 The role will always be added the `wheel` or `admin` group, depending on the
-platform. The role sets up sudo with a `/etc/sudoers.d/00-admin` file so that
-admin users can run sudo without a password. 
+platform. If there are admin users defined, then this role sets up sudo with a
+`/etc/sudoers.d/00-admin` file so that admin users can run sudo without a
+password. 
 
 ```yaml
 users_admin_groups:
   - sshusers
 ```
 
-Unix groups that regular users should have:
+### Unix groups that regular users should have:
 ```yaml
-users_regular_groups:
+* users_regular_groups:
   - sshusers
 ```
 
-Unix groups that the deploy user should have:
+* Unix groups that the deploy user should have:
 
 ```yaml
 users_deploy_groups:
   - sshusers
 ```
 
-Unix groups that the app user should have:
+* Unix groups that the app user should have:
 
 ```yaml
 users_app_groups:
