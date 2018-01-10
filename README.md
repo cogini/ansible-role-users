@@ -13,8 +13,8 @@ The role supports creating the following types of user accounts:
 * Global system admins / ops team
 
 These users have their own logins on the server with sudo permissions. We add
-them to the "wheel" or "admin" group, then configure sudo to allow them
-to run sudo without a password.
+them to the `wheel` or `admin` group, then allow them to run sudo without a
+password.
 
 When we provision a server, we automatically create accounts for our system
 admin team, independent of the project.
@@ -23,6 +23,7 @@ admin team, independent of the project.
 
 These users have the same rights as global admins, but are set up on
 per-project or per-server basis, controlled with inventory host/group vars.
+Normally the tech lead for the project would be an admin. 
 
 * Deploy account
 
@@ -34,6 +35,10 @@ The app and deploy accounts generally do not have sudo permissions, though we
 may make a `/etc/sudoers.d/` rule to allow them to run commands to e.g. restart
 the app by running `systemctl`. That is handled by the role that installs and
 configures the app, not this role.
+
+For example, `/etc/sudoers.d/deploy-foo`:
+
+    {{ users_deploy_user }} ALL=(ALL) NOPASSWD: /bin/systemctl start {{ app_name }}, /bin/systemctl stop {{ app_name }}, /bin/systemctl restart {{ app_name }}, /bin/systemctl status {{ app_name }}
 
 * App account
 
