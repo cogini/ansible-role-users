@@ -26,7 +26,7 @@ admin team, independent of the project.
 
 These users have the same rights as global admins, but are set up on
 per-project or per-server basis, controlled with inventory host/group vars.
-Normally the tech lead for the project would be an admin. 
+Normally the tech lead for the project would be an admin.
 
 * Deploy account
 
@@ -54,7 +54,7 @@ for logs, and has read-only access to its code and config files.
 
 Developers may need to access the deploy or app user account to look at the
 logs and debug it. We add the ssh keys for developers to the accounts, allowing
-them to log in via ssh. 
+them to log in via ssh.
 
 * Project users
 
@@ -62,7 +62,7 @@ These users are like admins, but don't have sudo. An example might
 be an account for a customer to be able to log in and run queries against
 the db, but they don't need admin rights. You can give them permissions
 to e.g. access the log files for the app by adding them to the app group
-and setting file permissions. 
+and setting file permissions.
 
 # Configuration
 
@@ -75,32 +75,32 @@ developers login access in the dev environment but not on prod.
 
 ## App accounts
 
-The account that deploys the app. 
-Optional, if not specified the deploy user will not be created.  
+The account that deploys the app.
+Optional, if not specified the deploy user will not be created.
 
     users_deploy_user: deploy
     users_deploy_group: deploy
 
-The account that runs the app. 
-Optional, if not specified the app user will not be created.  
+The account that runs the app.
+Optional, if not specified the app user will not be created.
 
     users_app_user: foo
     users_app_group: foo
 
-## User accounts 
+## User accounts
 
 The `users_users` defines Unix account names and ssh keys
 for users.
 
-It is a list of dicts with four fields: 
- 
+It is a list of dicts with four fields:
+
 * `user`: Name of the Unix account
-* `name`: User's name. Optional, for documentation. 
+* `name`: User's name. Optional, for documentation.
 * `key`:  ssh public key file. Put them in e.g. your playbook `files` directory.
-* `github` is the user's GitHub id. The role gets the user keys from 
+* `github` is the user's GitHub id. The role gets the user keys from
 `https://github.com/{{ github }}.keys`
 
-Example: 
+Example:
 
 ```yaml
 users_users:
@@ -116,7 +116,7 @@ users_users:
 
 After defining the user accounts in `users_users`, configure lists of users,
 specifying the id used in the `user` key. By default, these are empty, so if
-you don't specify users, they will not be created. 
+you don't specify users, they will not be created.
 
 Global admin users with a separate Unix account and sudo permissions.
 
@@ -155,28 +155,28 @@ users_app_users:
 
 ## Group configuration
 
-You can specify additional groups which the different types of users will have. 
-By default these lists are empty, but you can use it to fine tune access to the app. 
+You can specify additional groups which the different types of users will have.
+By default these lists are empty, but you can use it to fine tune access to the app.
 
 We normally configure ssh so that a user account must must be a member of a
-`sshusers` group, or ssh will not allow anyone to log in. 
+`sshusers` group, or ssh will not allow anyone to log in.
 
 Add this to `/etc/ssh/sshd_config`
 
     AllowGroups sshusers sftpusers
 
-Then add `sshusers` to the `users_admin_groups`, e.g.  
+Then add `sshusers` to the `users_admin_groups`, e.g.
 ```yaml
 users_admin_groups:
   - sshusers
 ```
 
-### Unix groups that admin users should have. 
+### Unix groups that admin users should have.
 
 The role will always be added the `wheel` or `admin` group, depending on the
 platform. If there are admin users defined, then this role sets up sudo with a
 `/etc/sudoers.d/00-admin` file so that admin users can run sudo without a
-password. 
+password.
 
 ```yaml
 users_admin_groups:
@@ -205,25 +205,25 @@ users_app_groups:
 
 ## Deleting users
 
-This role defines users that it creates with "ansible-" in the comment. 
+This role defines users that it creates with "ansible-" in the comment.
 This allows it to track when users are added or removed from the lists
 and delete the accounts.
 
 You can also specify accounts in the `users_delete_users` list and they will be
-deleted. This is useful for cleaning up legacy accounts. 
+deleted. This is useful for cleaning up legacy accounts.
 
-You can control whether to delete the user's home directory when delting the
-account with the `users_delete_remove` and `users_delete_force` variables. 
+You can control whether to delete the user's home directory when deleting the
+account with the `users_delete_remove` and `users_delete_force` variables.
 See [the Ansible docs](http://docs.ansible.com/ansible/user_module.html) for details.
 For safety, these variables are `no` by default, but if you are managing the
-system users with this role, you probably want to set them to `yes`. 
+system users with this role, you probably want to set them to `yes`.
 
     users_delete_remove: yes
     users_delete_force: yes
 
 The role can optionally remove authorized keys from system users like 'root' or 'ubuntu'.
 This is useful for security to avoid backup root keys, once you have set up named admin
-users.  
+users.
 
     users_remove_system_authorized_keys: true
 
@@ -234,7 +234,7 @@ That creates admin users and sets up their keys so that they can run the
 other roles which configure the server. A project specific role is responsible
 for preparing the server for the app, e.g. creating directories and installing
 dependencies. We normally deploy the app from a build or CI server, without sudo,
-using the `deploy` user account. 
+using the `deploy` user account.
 
 Here is a typical playbook:
 
@@ -258,18 +258,18 @@ Here is a typical playbook:
     - { role: cogini.users, become: true }
 ```
 
-Add the host to the `inventory/hosts` file. 
+Add the host to the `inventory/hosts` file.
 
     [web-servers]
     web-server-01
 
-Add the host to `.ssh/config` or a project specific `ssh.config` file. 
+Add the host to `.ssh/config` or a project specific `ssh.config` file.
 
     Host web-server-01
         HostName 123.45.67.89
 
 On a physical server where we start with a root account and no ssh keys, we need
-to bootstrap the server the first time, specifying the password with -k. 
+to bootstrap the server the first time, specifying the password with -k.
 
     ansible-playbook -k -u root -v -l web-server-01 playbooks/manage-users.yml --extra-vars "ansible_host=123.45.67.89"
 
