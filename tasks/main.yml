@@ -8,7 +8,7 @@
   include_tasks: "setup-{{ ansible_os_family }}.yml"
 
 - name: Set admin_groups
-  set_fact: admin_groups={{ [admin_group] + users_admin_groups }}
+  set_fact: users_admin_groups={{ [users_admin_group] | union(users_admin_groups) }}
 
 - name: Create admin groups
   group: name={{ item }} state=present
@@ -57,7 +57,7 @@
 - name: Add admin users
   user:
     name: "{{ item }}"
-    groups: "{{ admin_groups | join(',') }}"
+    groups: "{{ users_admin_groups | join(',') }}"
     comment: "ansible-{{ item }}"
     shell: /bin/bash
     append: no
