@@ -2,7 +2,9 @@
 # tasks file for users
 
 - name: Include OS-specific variables
-  include_vars: "{{ ansible_os_family }}.yml"
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}.yml"
 
 - name: Include OS-specific tasks
   include_tasks: "setup-{{ ansible_os_family }}.yml"
@@ -127,6 +129,18 @@
       groups: "{{ users_deploy_groups | join(',') }}"
       shell: /bin/bash
 
+  - name: Stat deploy user authorized_keys
+    stat:
+      path: "/home/{{ users_deploy_user }}/.ssh/authorized_keys"
+    register: authorized_keys_file
+
+  - name: Backup deploy user ssh keys
+    file:
+      src: "/home/{{ users_deploy_user }}/.ssh/authorized_keys"
+      path: "/home/{{ users_deploy_user }}/.ssh/authorized_keys.bak"
+      state: hard
+    when: authorized_keys_file.stat.exists
+
   - name: Remove deploy user ssh keys
     file:
       path: "/home/{{ users_deploy_user }}/.ssh/authorized_keys"
@@ -163,6 +177,18 @@
       group: "{{ users_app_group }}"
       groups: "{{ users_app_groups | join(',') }}"
       shell: /bin/bash
+
+  - name: Stat deploy user authorized_keys
+    stat:
+      path: "/home/{{ users_app_user }}/.ssh/authorized_keys"
+    register: authorized_keys_file
+
+  - name: Backup app user ssh keys
+    file:
+      src: "/home/{{ users_app_user }}/.ssh/authorized_keys"
+      path: "/home/{{ users_app_user }}/.ssh/authorized_keys.bak"
+      state: hard
+    when: authorized_keys_file.stat.exists
 
   - name: Remove app user ssh keys
     file:
