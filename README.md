@@ -284,7 +284,7 @@ On following runs, after the admin users are set up, use:
 
 ## Deleting legacy users
 
-Define legacy user accounts to delte in the `users_delete_users` list, e.g.:
+Define legacy user accounts to delete in the `users_delete_users` list, e.g.:
 
     ansible-playbook -u $USER -v -l web-servers playbooks/manage-users.yml --extra-vars "users_delete_users=[fred] users_delete_remove=yes users_delete_force=yes"
 
