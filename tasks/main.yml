@@ -172,7 +172,7 @@
       path: "/home/{{ users_app_user }}/.ssh/authorized_keys"
       state: absent
 
-  - name: Add ssh keys for app users from files from files
+  - name: Add ssh keys for app users from files
     authorized_key:
       user: "{{ users_app_user }}"
       key: "{{ lookup('file', item.key) }}"
@@ -184,7 +184,7 @@
       user: "{{ users_app_user }}"
       key: "https://github.com/{{ item.github }}.keys"
     with_items: "{{ users_users }}"
-    when: item.key is defined and item.user in users_app_users and not ansible_check_mode
+    when: item.github is defined and item.user in users_app_users and not ansible_check_mode
 
   when: users_app_user is defined
 
