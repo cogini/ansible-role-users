@@ -4,7 +4,8 @@
 - name: Include OS-specific variables
   include_vars: "{{ item }}"
   with_first_found:
-    - "{{ ansible_distribution }}.yml"
+    - "distribution-{{ ansible_distribution }}.yml"
+    - distribution-default.yml
 
 - name: Include OS-specific tasks
   include_tasks: "setup-{{ ansible_os_family }}.yml"
@@ -183,7 +184,7 @@
       user: "{{ users_app_user }}"
       key: "https://github.com/{{ item.github }}.keys"
     with_items: "{{ users_users }}"
-    when: item.github is defined and item.user in users_app_users and not ansible_check_mode
+    when: item.key is defined and item.user in users_app_users and not ansible_check_mode
 
   when: users_app_user is defined
 
