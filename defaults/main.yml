@@ -13,7 +13,7 @@
 #
 # `user` is the name of the Unix account
 # `name` is the user's name, optional, just for documentation
-# `group` is user's primary group, optional, will use user value if undefined
+# `group` is user's primary group, optional.
 # `key` is a ssh public key file
 # `github` is the user's GitHub id
 #
