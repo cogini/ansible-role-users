@@ -59,12 +59,14 @@
 # http://docs.ansible.com/ansible/user_module.html
 - name: Add admin users
   user:
-    name: "{{ item }}"
+    name: "{{ item.user }}"
+    group: "{{ item.group | default(omit) }}"
     groups: "{{ users_admin_groups | join(',') }}"
-    comment: "ansible-{{ item }}"
+    comment: "ansible-{{ item.user }}"
     shell: /bin/bash
     append: no
-  with_items: "{{ users_global_admin_users | union(users_admin_users) }}"
+  with_items: "{{ users_users }}"
+  when: "item.user in admin_users"
 
 # http://docs.ansible.com/ansible/authorized_key_module.html
 - name: Set ssh keys for admin users from files
@@ -90,11 +92,13 @@
 
 - name: Add regular users
   user:
-    name: "{{ item }}"
+    name: "{{ item.user }}"
+    group: "{{ item.group | default(omit) }}"
     groups: "{{ users_regular_groups | join(',') }}"
-    comment: "ansible-{{ item }}"
+    comment: "ansible-{{ item.user }}"
     shell: /bin/bash
-  with_items: "{{ users_regular_users }}"
+  with_items: "{{ users_users }}"
+  when: "item.user in users_regular_users"
 
 - name: Set ssh keys for regular users from files
   authorized_key:

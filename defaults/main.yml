@@ -9,10 +9,11 @@
 # users_app_user: foo
 # users_app_group: foo
 
-# User accounts and ssh keys for the people or other automated users. 
+# User accounts and ssh keys for the people or other automated users.
 #
 # `user` is the name of the Unix account
 # `name` is the user's name, optional, just for documentation
+# `group` is user's primary group, optional.
 # `key` is a ssh public key file
 # `github` is the user's GitHub id
 #
@@ -22,6 +23,7 @@
 #     github: reachfh
 #   - user: ci
 #     name: "CI server"
+#     group: devops
 #     key: ci.pub
 users_users: []
 
