@@ -93,7 +93,7 @@
 - name: Add regular users
   user:
     name: "{{ item.user }}"
-    group: "{{ item.group | default(item.user) }}"
+    group: "{{ item.group | default(omit) }}"
     groups: "{{ users_regular_groups | join(',') }}"
     comment: "ansible-{{ item.user }}"
     shell: /bin/bash
